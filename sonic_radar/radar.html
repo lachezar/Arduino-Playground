@@ -4,99 +4,99 @@
     </head>
     <body>
         <canvas id="radar" width="1200" height="600" style="position: absolute; z-index: 1; left: 0; top: 0;">where is your Canvas nao???</canvas>
-		<canvas id="map" width="1200" height="600" style="position: absolute; z-index: 10; left: 0; top: 0;">where is your Canvas nao???</canvas>
-		<script type="text/javascript">
+        <canvas id="map" width="1200" height="600" style="position: absolute; z-index: 10; left: 0; top: 0;">where is your Canvas nao???</canvas>
+        <script type="text/javascript">
 
 var radar_refresh = (function() {
     var radar = document.getElementById('radar');
-	var map = document.getElementById('map');
+    var map = document.getElementById('map');
     var ctxR = radar.getContext('2d');
-	var ctxM = map.getContext('2d');
+    var ctxM = map.getContext('2d');
     var w = map.width;
     var h = map.height;
     //angle = 1.05;
     //k = 0.001;
-	//distance = 0;
+    //distance = 0;
     
     return (function(angle, distance, k) {
         
-		ctxR.beginPath();
+        ctxR.beginPath();
         ctxR.fillStyle = "rgba(0, 0, 0, 0.2)";
         ctxR.fillRect(0, 0, w, h);
-	
-		ctxR.strokeStyle = 'white';
-		ctxR.lineWidth = 1;
+    
+        ctxR.strokeStyle = 'white';
+        ctxR.lineWidth = 1;
         ctxR.arc(w/2, h, w/2, 1.05*Math.PI, 1.95*Math.PI);
         ctxR.stroke();
-	
-		
+    
+        
         /*if (angle <= 1.05 || angle >= 1.95) {
             k *= -1.0;
         }
-		
-		angle += k;*/
-		
-		ctxM.beginPath();
-		ctxM.strokeStyle = 'black';
-		ctxM.lineWidth = 3;
-		ctxM.moveTo(w/2, h);
-		ctxM.lineTo(w/2+Math.cos(angle*Math.PI)*w/2, h+Math.sin(angle*Math.PI)*w/2);
-		ctxM.stroke();
-		
-		ctxR.beginPath();
-		ctxR.strokeStyle = 'black';
-		ctxR.lineWidth = 2;
-		ctxR.moveTo(w/2, h);
-		ctxR.lineTo(w/2+Math.cos(angle*Math.PI)*w/2, h+Math.sin(angle*Math.PI)*w/2);
-		ctxR.stroke();
-		ctxR.beginPath();
-		ctxR.lineWidth = 2;
-		ctxR.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-		ctxR.moveTo(w/2, h);
-		ctxR.lineTo(w/2+Math.cos((angle+k)*Math.PI)*w/2, h+Math.sin((angle+k)*Math.PI)*w/2);
-		ctxR.stroke();
-		/*ctxM.beginPath();
-		ctxM.strokeStyle = 'white';
-		ctxM.lineWidth = 1;
-		ctxM.moveTo(w/2, h);
+        
+        angle += k;*/
+        
+        ctxM.beginPath();
+        ctxM.strokeStyle = 'black';
+        ctxM.lineWidth = 3;
+        ctxM.moveTo(w/2, h);
+        ctxM.lineTo(w/2+Math.cos(angle*Math.PI)*w/2, h+Math.sin(angle*Math.PI)*w/2);
+        ctxM.stroke();
+        
+        ctxR.beginPath();
+        ctxR.strokeStyle = 'black';
+        ctxR.lineWidth = 2;
+        ctxR.moveTo(w/2, h);
+        ctxR.lineTo(w/2+Math.cos(angle*Math.PI)*w/2, h+Math.sin(angle*Math.PI)*w/2);
+        ctxR.stroke();
+        ctxR.beginPath();
+        ctxR.lineWidth = 2;
+        ctxR.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctxR.moveTo(w/2, h);
+        ctxR.lineTo(w/2+Math.cos((angle+k)*Math.PI)*w/2, h+Math.sin((angle+k)*Math.PI)*w/2);
+        ctxR.stroke();
+        /*ctxM.beginPath();
+        ctxM.strokeStyle = 'white';
+        ctxM.lineWidth = 1;
+        ctxM.moveTo(w/2, h);
         ctxM.lineTo(w/2+Math.cos((angle+2*k)*Math.PI)*w/2, h+Math.sin((angle+2*k)*Math.PI)*w/2);
         ctxM.stroke();*/
-		
-		
-		ctxM.beginPath();
-		ctxM.strokeStyle = 'lime';
-		ctxM.lineWidth = 1;
-		ctxM.arc(w/2+Math.cos(angle*Math.PI) * distance, h+Math.sin(angle*Math.PI) * distance, 1, 0, 2 * Math.PI, true);
-		ctxM.stroke();
-		  
+        
+        
+        ctxM.beginPath();
+        ctxM.strokeStyle = 'lime';
+        ctxM.lineWidth = 1;
+        ctxM.arc(w/2+Math.cos(angle*Math.PI) * distance, h+Math.sin(angle*Math.PI) * distance, 1, 0, 2 * Math.PI, true);
+        ctxM.stroke();
+          
     });
 })();
 
-		</script>
-		
-		<script src="/socket.io/socket.io.js"></script>
-		<script>
-		  var socket = io.connect('http://localhost:8080');
-		  socket.on('radar_data', function(obj) {
-			console.log(obj);
-			
-			var k = 0;
-			var data = obj.data;
-			if (data[0] === '+') {
-				k = (1.9*Math.PI)/180;
-			} else {
-				k = -(1.9*Math.PI)/180;
-			}
-			
-			parts = data.split(' ');
-			var angle = 1.05 + (Math.abs(parseInt(parts[0]))/1800) * 0.9;
-			var distance = 2 * parseInt(parts[1]);
-			console.log(parts[0], parseInt(parts[0]), angle, distance);
-			
-			radar_refresh(angle, distance, k);
-			// parse message
-			// draw line
-		  });
-		</script>
+        </script>
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+          var socket = io.connect('http://localhost:8080');
+          socket.on('radar_data', function(obj) {
+            console.log(obj);
+            
+            var k = 0;
+            var data = obj.data;
+            if (data[0] === '+') {
+                k = (1.9*Math.PI)/180;
+            } else {
+                k = -(1.9*Math.PI)/180;
+            }
+            
+            parts = data.split(' ');
+            var angle = 1.05 + (Math.abs(parseInt(parts[0]))/1800) * 0.9;
+            var distance = 2 * parseInt(parts[1]);
+            console.log(parts[0], parseInt(parts[0]), angle, distance);
+            
+            radar_refresh(angle, distance, k);
+            // parse message
+            // draw line
+          });
+        </script>
     </body>
 </html>

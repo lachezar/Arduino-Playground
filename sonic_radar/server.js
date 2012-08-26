@@ -14,20 +14,20 @@ app.get('/', function(req, res) {
 });
 
 io.sockets.on('connection', function(socket) {
-	
-	var buffer = '';
-	var i;
-	
-	var serial = new SerialPort('COM3', { baudrate : 9600 });
-	serial.on('data', function(chunk) {
-		buffer += chunk;
-		if (buffer.indexOf(';') > -1) {
-			var messages = buffer.split(';');
-			for (i = 0; i < messages.length - 1; i++) {
-				sys.puts(messages[i]);
-				socket.emit('radar_data', { data: messages[i] });
-			}
-			buffer = messages[messages.length-1];
-		}
-	});
+    
+    var buffer = '';
+    var i;
+    
+    var serial = new SerialPort('COM3', { baudrate : 9600 });
+    serial.on('data', function(chunk) {
+        buffer += chunk;
+        if (buffer.indexOf(';') > -1) {
+            var messages = buffer.split(';');
+            for (i = 0; i < messages.length - 1; i++) {
+                sys.puts(messages[i]);
+                socket.emit('radar_data', { data: messages[i] });
+            }
+            buffer = messages[messages.length-1];
+        }
+    });
 });
