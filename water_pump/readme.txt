@@ -1,0 +1,3 @@
+Plant watering system using electrical water pump.
+
+The state of the project: waiting for the components to be shipped...
