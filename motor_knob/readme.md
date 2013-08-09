@@ -2,7 +2,7 @@ Example of stepper motor sketch.
 
 Here is [short demo](https://vine.co/v/hhJ9PBu7IHZ) on Vine.
 
-Wiring: 
+Photo of the wiring: 
 
-!(http://i.imgur.com/5z2NArL.jpg?1)
+![photo of the wiring](http://i.imgur.com/5z2NArL.jpg?1)
 
