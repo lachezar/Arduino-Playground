@@ -2,18 +2,18 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Cannon</title>
+    <title>Water Cannon</title>
     <style>
         body {
             margin: 0;
             padding: 0;
         }
-        
+
         #blast {
             font-size: 2em;
             padding: 0 10px;
         }
-        
+
         .center {
             text-align: center;
         }
@@ -24,13 +24,14 @@
 <div class="center">
     <button id="blast">Blast &#x01F6BF;</button>
     <br/>
-    Use the arrows or touch.
+    &#x2190; &#x2191; &#x2192; or &#x1f446;.
 </div>
 <script>
 (function(d,w) {
     var rAF = w.requestAnimationFrame || w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame;
     var canvas = d.getElementById("canvas");
     var ctx = canvas.getContext("2d");
+    var blastBtn = d.getElementById("blast");
     var maxLeft = 1.1; // max left rotation of the cannon
     var maxRight = 1.9; // max right rotation of the cannon
     var angle = (maxLeft + maxRight) / 2;
@@ -40,23 +41,29 @@
     var fineGrainedStep = 0.001;
     var center = 100; // dimensions
     var arcR = 60;
-    
+    var isBlasting = false; // controls the water cannon
+
     var repaint = function() {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        if (isBlasting) {
+            ctx.fillStyle = "rgba(208, 255, 255, 0.5)";
+        } else {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        }
+
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.arc(center, center, arcR, Math.PI * maxLeft, Math.PI * maxRight, false);
         ctx.lineWidth = center / 20;
         ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
         ctx.stroke();
-        
+
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate(Math.PI * angle - Math.PI/2);
         ctx.beginPath();
-        
+
         var drawCannon = function() {
             ctx.strokeStyle = "#000";
             ctx.lineWidth = 6;
@@ -72,14 +79,14 @@
             ctx.lineTo(0, (arcR + 20) / 6);
             ctx.stroke();
         }
-        
+
         drawCannon(); // draw the left half of the cannon
         ctx.scale(-1, 1);
         drawCannon(); // draw the right half of the cannon symmetrically
 
         ctx.closePath();
         ctx.restore();
-        
+
         // left arrow
         if (keyHolded === 37 && angle > maxLeft) {
             if (ctrlHolded) {
@@ -88,7 +95,7 @@
                 angle -= normalStep;
             }
         }
-        
+
         // right arrow
         if (keyHolded === 39 && angle < maxRight) {
             if (ctrlHolded) {
@@ -97,34 +104,36 @@
                 angle += normalStep;
             }
         }
-        
-        // up arrow
-        if (keyHolded === 38) {
-            d.getElementById("blast").onclick();
-        }
-        
+
         rAF(repaint);
-    }
-    
-	// key was holded
+    };
+
+    // key was holded
     w.onkeydown = function(e) {
         evt = e || w.event;
         keyHolded = evt.keyCode;
         ctrlHolded = evt.ctrlKey;
-    }
-    
-	// key was released
+
+        if (keyHolded === 38) {
+            startBlast(e);
+        }
+    };
+
+    // key was released
     w.onkeyup = function(e) {
         evt = e || w.event;
         if (keyHolded === evt.keyCode) {
             keyHolded = 0;
             ctrlHolded = evt.ctrlKey;
         }
-        
-    }
-    
+
+        if (evt.keyCode === 38) {
+            stopBlast(e);
+        }
+    };
+
     // handle touch events
-    canvas.addEventListener("touchmove", function(e) {
+    canvas.ontouchmove = function(e) {
         e.preventDefault();
         var x = - e.touches[0].pageX + center;
         var possibleAngle = Math.acos(parseFloat(x) / arcR) / Math.PI + 1;
@@ -136,13 +145,22 @@
         } else if (!isNaN(possibleAngle)) {
             angle = possibleAngle;
         }
-    }, false);
-    
-    d.getElementById("blast").onclick = function(e) {
-        alert("~~~~~~~~\n ~~~~~~~ \n~~~~~~~~");
     };
-    
-	// recalculate the canvas dimensions to fit the screen
+
+    var startBlast = function(e) {
+        e.preventDefault();
+        isBlasting = true;
+    };
+
+    var stopBlast = function(e) {
+        e.preventDefault();
+        isBlasting = false;
+    };
+
+    blastBtn.onmousedown = blastBtn.ontouchstart = startBlast;
+    blastBtn.onmouseup = blastBtn.ontouchend = stopBlast;
+
+    // recalculate the canvas dimensions to fit the screen
     w.onresize = function(e) {
         var side = Math.min(d.body.clientWidth, d.body.clientHeight - 70);
         canvas.width = side;
@@ -150,10 +168,10 @@
         center = side / 2;
         arcR = 0.6 * center;
     };
-    
+
     w.onresize();
     rAF(repaint);
-    
+
 }(document, window));
 </script>
 </body>
