@@ -26,14 +26,16 @@
     <br/>
     &#x2190; &#x2191; &#x2192; or &#x1f446;.
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
 <script>
 (function(d,w) {
     var rAF = w.requestAnimationFrame || w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame;
     var canvas = d.getElementById("canvas");
     var ctx = canvas.getContext("2d");
     var blastBtn = d.getElementById("blast");
-    var maxLeft = 1.1; // max left rotation of the cannon
-    var maxRight = 1.9; // max right rotation of the cannon
+    var maxLeft = 1.05; // max left rotation of the cannon
+    var maxRight = 1.95; // max right rotation of the cannon
     var angle = (maxLeft + maxRight) / 2;
     var keyHolded = 0;
     var ctrlHolded = false;
@@ -42,8 +44,21 @@
     var center = 100; // dimensions
     var arcR = 60;
     var isBlasting = false; // controls the water cannon
+    
+    var socket = io.connect();
+    var lastSent = {};
 
     var repaint = function() {
+    
+        // send normalized data to the server
+        var rotationAngle = Math.max(parseInt(((angle - maxLeft) / (maxRight - maxLeft)) * 1023), 0);
+        var message = {rotationAngle: rotationAngle, isBlasting: isBlasting};
+        // send only unique messages
+        if (JSON.stringify(lastSent) != JSON.stringify(message)) {
+            socket.emit('update', message);
+            lastSent = message;
+        }
+    
         if (isBlasting) {
             ctx.fillStyle = "rgba(208, 255, 255, 0.5)";
         } else {
@@ -168,7 +183,7 @@
         center = side / 2;
         arcR = 0.6 * center;
     };
-
+    
     w.onresize();
     rAF(repaint);
 
