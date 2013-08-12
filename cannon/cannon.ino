@@ -1,6 +1,8 @@
 #include <Servo.h>
 
 #define SERVO_PIN 9
+#define PUMP_PIN 3
+#define LED_PIN 5
 
 Servo servo;
 char serialState;
@@ -14,6 +16,9 @@ void setup() {
   serialState = 0;
   rotationAngle = 0;
   isBlasting = 0;
+  
+  pinMode(PUMP_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() {
@@ -33,6 +38,9 @@ void loop() {
     } else if (serialState == 1) {
       isBlasting = c - '0';
     }
+    
+    digitalWrite(PUMP_PIN, isBlasting ? HIGH : LOW);
+    digitalWrite(LED_PIN, isBlasting ? HIGH : LOW);
     
   }
 }
