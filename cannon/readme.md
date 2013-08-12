@@ -12,3 +12,12 @@ Constructing the water tank:
 
 If your water pump has short wires like mine or you can not put it in deep water, then you could use the [hydrostatic pressure](http://www.youtube.com/watch?v=Ffe7JfYyBFE) on your side (just a hole in a bottle :D).
 
+Short overview of the architecture:
+```
+-----------                 -------------                 -----------
+| Web     |  socket.io      | server.js |  serial port    | Arduino |
+| Browser | --------------> |           | --------------> | Board   |
+-----------                 -------------                 -----------
+```
+- socket.io let's you use WebSockets and it will gracefully fall back to other communication methods if WebSockets are no supported.
+- server.js is a node application that will proxy instructions from the web browser to the serial port of the Arduino board.
