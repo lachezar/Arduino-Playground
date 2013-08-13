@@ -21,3 +21,6 @@ Short overview of the architecture:
 ```
 - socket.io let's you use WebSockets and it will gracefully fall back to other communication methods if WebSockets are no supported.
 - server.js is a node application that will proxy instructions from the web browser to the serial port of the Arduino board.
+
+Useful article about [power saving with Arduino](http://donalmorrissey.blogspot.se/2010/04/sleeping-arduino-part-5-wake-up-via.html).
+
