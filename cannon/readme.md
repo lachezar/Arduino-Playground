@@ -6,7 +6,7 @@ Then run the server with `node ./server.js` and open the cannon control page (lo
 
 To control the cannon use the arrows or touch (if you have touch screen device).
 
-Here is a [Vine with the concept](https://vine.co/v/hhPXA0EWuMh). <del>I am still missing few parts to make a decent prototype.</del> Here is a [video with the fully operational cannon](http://www.youtube.com/watch?v=kpN9SZHvAV).
+Here is a [Vine with the concept](https://vine.co/v/hhPXA0EWuMh). <del>I am still missing few parts to make a decent prototype.</del> Here is a [video with the fully operational cannon](http://youtu.be/kpN9SZHvAV0).
 
 Constructing the water tank:
 
