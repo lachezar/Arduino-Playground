@@ -6,7 +6,7 @@ Then run the server with `node ./server.js` and open the cannon control page (lo
 
 To control the cannon use the arrows or touch (if you have touch screen device).
 
-Here is a [Vine with the concept](https://vine.co/v/hhPXA0EWuMh). I am still missing few parts to make a decent prototype.
+Here is a [Vine with the concept](https://vine.co/v/hhPXA0EWuMh). <del>I am still missing few parts to make a decent prototype.</del> Here is a [video with the fully operational cannon](www.youtube.com/watch?v=kpN9SZHvAV).
 
 Constructing the water tank:
 
@@ -24,3 +24,20 @@ Short overview of the architecture:
 
 Useful article about [sleep modes](http://donalmorrissey.blogspot.se/2010/04/sleeping-arduino-part-5-wake-up-via.html) and [power saving](http://www.gammon.com.au/forum/?id=11497).
 
+
+Info about the used components:
+- [Water pump](http://dx.com/p/szf280-pvc-mini-water-pump-motor-beige-205304)
+- 4 x AA to power the pump
+- Battery holder
+- 2N3904 transistor to turn on/off the water pump
+- 1N4001 diode to stop the back-emf
+- LED
+- 2 x 220ohm resistors
+- 3.3Kohm resistor
+- Servo ... 3v, tiny servo will be good enough (it is just directing the water cannon)
+- Arduino Uno (or any other DIY board)
+- Bottle(s) - use this [nifty trick](http://www.youtube.com/watch?v=Ffe7JfYyBFE) to keep the water level low
+- Shallow tank/pot/bowl
+- Hose - I bought 3mm wide hose, but I needed 5mm, so I heated one of the ends of the hose with a lighter and expanded its size to fit the water pump tap. I also heated the hose in the other end to make it [more flexible and easier for the servo to bend](http://i.imgur.com/MZq9dSp.jpg?3) it. 
+ 
+![water cannon photo](http://i.imgur.com/fMhkEA6.jpg?1)
