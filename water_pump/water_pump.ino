@@ -12,43 +12,29 @@
 
 // measuring the actual time spent in sleep mode shows that it takes more than 8 sec.
 #define SLEEP_DURATION 9.35
-#define WATERING_DURATION 93 / SLEEP_DURATION // seconds
-#define WATERING_PERIOD 28 / SLEEP_DURATION // (60 * 60 * 24 * 3) // seconds
-
-unsigned long duration_counter;
-unsigned long period_counter;
+#define WATERING_DURATION (65 / SLEEP_DURATION) // seconds
+#define WATERING_PERIOD (( (3*60) / SLEEP_DURATION) - WATERING_DURATION) // (60 * 60 * 24 * 3) // seconds
 
 void setup () {
   pinMode(PUMP_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
-  duration_counter = 0;
-  period_counter = 0;
 }
 
 void loop() {
   
-  if (period_counter < WATERING_PERIOD) {
-    digitalWrite(LED_PIN, LOW);
-    digitalWrite(PUMP_PIN, LOW);
+  digitalWrite(LED_PIN, LOW);
+  digitalWrite(PUMP_PIN, LOW);
+  
+  for (int period_counter = 0; period_counter < WATERING_PERIOD; period_counter++) {
     // Sleep for 8 s with ADC module and BOD module off
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
-    period_counter++;
-  } else if (duration_counter < WATERING_DURATION) {
-    digitalWrite(LED_PIN, HIGH);
-    digitalWrite(PUMP_PIN, HIGH);
-    // Sleep for 8 s with ADC module and BOD module off
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
-    duration_counter++;
-  } else {
-    period_counter = 0;
-    duration_counter = 0;
   }
   
-  /*delay(2500);
-  digitalWrite(PUMP_PIN, HIGH);
   digitalWrite(LED_PIN, HIGH);
-  delay(4000);
-  digitalWrite(PUMP_PIN, LOW);
-  digitalWrite(LED_PIN, LOW);
-  delay(2500);  */
+  digitalWrite(PUMP_PIN, HIGH);
+  
+  for (int duration_counter = 0; duration_counter < WATERING_DURATION; duration_counter++) {
+    // Sleep for 8 s with ADC module and BOD module off
+    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+  }
 }
