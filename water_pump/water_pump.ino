@@ -17,7 +17,7 @@
 #define LED_PIN 13
 
 // measuring the actual time spent in sleep mode shows that it takes more than 8 sec.
-#define SLEEP_DURATION 9.35
+#define SLEEP_DURATION 9.26
 
 const unsigned long WATERING_DURATION_CYCLES = (unsigned long)WATERING_DURATION_IN_SECONDS / SLEEP_DURATION;
 const unsigned long WATERING_PERIOD_CYCLES = ((unsigned long)WATERING_PERIOD_IN_DAYS*24*60*60) / SLEEP_DURATION;
