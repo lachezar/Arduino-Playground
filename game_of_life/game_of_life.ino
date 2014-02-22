@@ -1,6 +1,6 @@
 #define PIN_BL    8
-#define PIN_SCE   7
-#define PIN_RESET 6
+#define PIN_RESET 7
+#define PIN_SCE   6
 #define PIN_DC    5
 #define PIN_SDIN  4
 #define PIN_SCLK  3
