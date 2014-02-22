@@ -13,8 +13,9 @@
 #define LCD_Y     48
 
 // surrounding buffer zone of 8 dots
-#define MATRIX_W  (84+8+8)
-#define MATRIX_H  ((48+8+8) >> 3)
+#define BUFFER_DOTS 8
+#define MATRIX_W  (LCD_X + 2*BUFFER_DOTS)
+#define MATRIX_H  ((LCD_Y + 2*BUFFER_DOTS) >> 3)
 
 static byte matrixes[2][MATRIX_H][MATRIX_W];
 byte currentMatrix;
@@ -67,8 +68,8 @@ void reviveRandomCells(byte n) {
 }
 
 void lcdDrawMatrix() {
-  for (byte i = 1; i < MATRIX_H - 1; i++) {
-    for (byte j = 8; j < MATRIX_W - 8; j++) {
+  for (byte i = BUFFER_DOTS >> 3; i < MATRIX_H - (BUFFER_DOTS >> 3); i++) {
+    for (byte j = BUFFER_DOTS; j < MATRIX_W - BUFFER_DOTS; j++) {
       lcdWrite(LCD_D, matrixes[currentMatrix][i][j]);
     }
   }
