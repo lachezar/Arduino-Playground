@@ -1,10 +1,12 @@
-#define PIN_BL    8
-#define PIN_RESET 7
-#define PIN_SCE   6
+#include <SPI.h>
+
+#define PIN_BL    3
 #define PIN_DC    5
-#define PIN_SDIN  4
-#define PIN_SCLK  3
-#define PIN_BTN   2
+#define PIN_SCE   6
+#define PIN_RESET 7
+#define PIN_SDIN  11
+#define PIN_SCLK  13
+#define APIN_POT  1
 
 #define LCD_C     LOW
 #define LCD_D     HIGH
@@ -12,16 +14,18 @@
 #define LCD_X     84
 #define LCD_Y     48
 
+#define POT_MAX   690
+
 // surrounding buffer zone of 8 dots
 #define BUFFER_DOTS 8
 #define MATRIX_W  (LCD_X + 2*BUFFER_DOTS)
 #define MATRIX_H  ((LCD_Y + 2*BUFFER_DOTS) >> 3)
 
+short potLevel;
+short noRandomRevivalCounter = 200;
+
 static byte matrixes[2][MATRIX_H][MATRIX_W];
 byte currentMatrix;
-
-byte blState = HIGH;
-byte btnState = LOW;
 
 inline byte nextGenerationMatrix() {
   return (currentMatrix + 1) & 1;
@@ -67,6 +71,27 @@ void reviveRandomCells(byte n) {
   }
 }
 
+void createGosperGlider() {
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 0] = 0x60;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 1] = 0x60;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 10] = 0x70;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 11] = 0x88;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 12] = 0x04;
+  matrixes[currentMatrix][(BUFFER_DOTS >> 3) + 1][BUFFER_DOTS + 12] = 0x01;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 13] = 0x04;
+  matrixes[currentMatrix][(BUFFER_DOTS >> 3) + 1][BUFFER_DOTS + 13] = 0x01;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 14] = 0x20;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 15] = 0x88;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 16] = 0x70;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 17] = 0x20;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 20] = 0x1C;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 21] = 0x1C;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 22] = 0x22;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 24] = 0x63;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 34] = 0x0C;
+  matrixes[currentMatrix][BUFFER_DOTS >> 3][BUFFER_DOTS + 35] = 0x0C;
+}
+
 void lcdDrawMatrix() {
   for (byte i = BUFFER_DOTS >> 3; i < MATRIX_H - (BUFFER_DOTS >> 3); i++) {
     for (byte j = BUFFER_DOTS; j < MATRIX_W - BUFFER_DOTS; j++) {
@@ -82,56 +107,66 @@ void lcdInitialise(void) {
   pinMode(PIN_DC, OUTPUT);
   pinMode(PIN_SDIN, OUTPUT);
   pinMode(PIN_SCLK, OUTPUT);
-  pinMode(PIN_BTN, INPUT);
+
+  SPI.begin();
+  SPI.setDataMode(SPI_MODE0);
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setClockDivider(SPI_CLOCK_DIV64);
+
   digitalWrite(PIN_RESET, LOW);
   digitalWrite(PIN_RESET, HIGH);
   lcdWrite(LCD_C, 0x21 );  // LCD Extended Commands.
+  lcdWrite(LCD_C, 0xB1 );  // Set LCD Vop (Contrast).
   lcdWrite(LCD_C, 0x04 );  // Set Temp coefficent. //0x04
   lcdWrite(LCD_C, 0x14 );  // LCD bias mode 1:48. //0x13
   lcdWrite(LCD_C, 0x0C );  // LCD in normal mode.
   lcdWrite(LCD_C, 0x20 );
   lcdWrite(LCD_C, 0x0C );
+  lcdWrite(LCD_C, 0x80);   // Set position X = 0
+  lcdWrite(LCD_C, 0x40);   // Set position Y = 0
 }
 
 void lcdWrite(byte dc, byte data) {
   digitalWrite(PIN_DC, dc);
   digitalWrite(PIN_SCE, LOW);
-  shiftOut(PIN_SDIN, PIN_SCLK, MSBFIRST, data);
+  SPI.transfer(data);
   digitalWrite(PIN_SCE, HIGH);
 }
 
-void toggleBacklight() {
-  if (btnState == LOW && digitalRead(PIN_BTN) == HIGH) {
-    btnState = HIGH;
-    blState = (blState + 1) & 1;
-    digitalWrite(PIN_BL, blState);
-  } else {
-    // debounce
-    btnState = LOW;
-  }
+void backlightLevel() {
+  potLevel = analogRead(APIN_POT);
+  byte brightness = map(potLevel, 0, POT_MAX, 0, 0xFF);
+  analogWrite(PIN_BL, brightness);
 }
 
 void setup(void) {
   currentMatrix = 0;
-  // initial state
-  matrixes[currentMatrix][5][50] = 255;
-  matrixes[currentMatrix][3][22] = 127;
-  matrixes[currentMatrix][3][23] = 63;
-  matrixes[currentMatrix][3][24] = 31;
+  createGosperGlider();
   
   lcdInitialise();
-  // turn on the back light
-  digitalWrite(PIN_BL, blState);
+  randomSeed(analogRead(0));
 }
 
 void loop(void) {
-  toggleBacklight();
+  backlightLevel();
   
   lcdDrawMatrix();
   
   // calculate the next generation and revive few cells to prevent "still life"
   nextGeneration();
-  reviveRandomCells(5);
-  
+
+  // bring some random cells to life, but not in the very beginning of the game
+  if (noRandomRevivalCounter > 0) {
+    noRandomRevivalCounter--;
+  } else {
+    reviveRandomCells(5);
+  }
+
   currentMatrix = nextGenerationMatrix();
+
+  // Regulate the speed of the game using the potentiometer.
+  // Also add some tolerance to be able to run at full speed - no delays.
+  if (POT_MAX - potLevel - 20 > 0) {
+    delay((POT_MAX - potLevel) >> 1);
+  }
 }
