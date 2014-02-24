@@ -111,19 +111,20 @@ void lcdInitialise(void) {
   SPI.begin();
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(SPI_CLOCK_DIV64);
+  SPI.setClockDivider(SPI_CLOCK_DIV4);
 
   digitalWrite(PIN_RESET, LOW);
+  delay(10);
   digitalWrite(PIN_RESET, HIGH);
-  lcdWrite(LCD_C, 0x21 );  // LCD Extended Commands.
-  lcdWrite(LCD_C, 0xB1 );  // Set LCD Vop (Contrast).
-  lcdWrite(LCD_C, 0x04 );  // Set Temp coefficent. //0x04
-  lcdWrite(LCD_C, 0x14 );  // LCD bias mode 1:48. //0x13
-  lcdWrite(LCD_C, 0x0C );  // LCD in normal mode.
-  lcdWrite(LCD_C, 0x20 );
-  lcdWrite(LCD_C, 0x0C );
-  lcdWrite(LCD_C, 0x80);   // Set position X = 0
-  lcdWrite(LCD_C, 0x40);   // Set position Y = 0
+
+  lcdWrite(LCD_C, 0x21);  // Extended instruction set selected
+  lcdWrite(LCD_C, 0xB1);  // Set LCD Vop (Contrast)
+  lcdWrite(LCD_C, 0x04);  // Set Temp coefficent
+  lcdWrite(LCD_C, 0x14);  // LCD bias mode 1:48
+  lcdWrite(LCD_C, 0x0C);  // LCD in normal mode
+  lcdWrite(LCD_C, 0x20);  // Revert to standard instruction set
+  lcdWrite(LCD_C, 0x80);  // Set position X = 0
+  lcdWrite(LCD_C, 0x40);  // Set position Y = 0
 }
 
 void lcdWrite(byte dc, byte data) {
